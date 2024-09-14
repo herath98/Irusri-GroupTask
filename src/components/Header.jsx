@@ -1,32 +1,31 @@
 import React from "react";
-import { Button, Navbar} from "flowbite-react";
+import {  Button,  Navbar} from "flowbite-react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon } from "react-icons/fa";
 import logo from "../assets/Group.png";
 
+
+
 export default function Header() {
-  
-    const path = useLocation().pathname;
+
 
     return (
         <Navbar className="border-b-2">
             <Link to="/" className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white">
             <img src={logo} alt="Logo" width={100} height={50} className="max-w-[100px] w-auto "/>
             </Link>
-         
+
             <Button className="w-12 h-10 lg:hidden" color="gray" pill>
                 <AiOutlineSearch />
             </Button>
             <div className="flex gap-2 md:order-2">
-                <Button className="w-12 h-10 hidden sm:inline" color="gray" pill>
-                    <FaMoon />
-                </Button>
+                
                 <Link to="/sign-in">
                     <Button outline gradientDuoTone="purpleToBlue">
                         Sign In
                     </Button>
                 </Link>
+
                 <Navbar.Toggle />
             </div>
             <Navbar.Collapse>
@@ -36,7 +35,7 @@ export default function Header() {
                 <NavLink to="/about" className="nav-link">
                     About
                 </NavLink>
-              
+
             </Navbar.Collapse>
         </Navbar>
     );

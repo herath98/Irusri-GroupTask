@@ -1,33 +1,15 @@
-import React, { useState, useContext } from 'react';
-import { Alert, Button, Label, Spinner, TextInput } from '@/components/ui/alert';
-import { Link, useNavigate } from 'react-router-dom';
-
-// Simulated AuthContext
-const AuthContext = React.createContext();
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  const register = (userData) => {
-    // Simulate storing user data (in a real app, you'd use more secure storage)
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, register }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+import React, { useState } from "react";
+import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { validateForm } from "../utils/validation";
+import logo from "../assets/Group.png";
 
 export default function SignUp() {
-  const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const { register } = useContext(AuthContext);
+  const { signUp, loading, error } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -38,34 +20,16 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.username || !formData.email || !formData.password) {
-      setErrorMessage('Please fill in all fields');
-      return;
-    }
-
-    if (formData.email === formData.password) {
-      setErrorMessage('Email and password cannot be the same');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Register the user
-      register(formData);
-      
-      setLoading(false);
-      setSuccessMessage('Signup successful! Redirecting to login page...');
-      setTimeout(() => {
-        setSuccessMessage(null);
-        navigate('/sign-in');
-      }, 1000);
-    } catch (error) {
-      console.error('Error:', error.message);
-      setErrorMessage('An error occurred during registration');
-      setLoading(false);
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        await signUp(formData.username, formData.email, formData.password);
+        navigate("/"); // Redirect to home page on successful sign up
+      } catch (err) {
+        // Error is handled by the useAuth hook
+      }
+    } else {
+      setErrors(validationErrors);
     }
   };
 
@@ -75,42 +39,54 @@ export default function SignUp() {
         <div className="w-full md:w-1/2 p-4">
           <div className="mt-12">
             <Link to="/" className="text-5xl font-bold dark:text-white">
-              <img src="/api/placeholder/400/350" alt="Logo" width={400} height={350} className="max-w-[400px] w-auto" />
+              <img src={logo} alt="Logo" width={400} height={350} className="max-w-[400px] w-auto" />
             </Link>
-            <p className="justify-center text-sm mt-4">Welcome to our platform. Sign up to get started on your journey with us.</p>
+            <p className="justify-center text-sm mt-4">The sun hung low in the sky, casting long shadows across the rugged landscape. The air was crisp, and the breeze was wafting with the scent of pine and damp earth.</p>
           </div>
         </div>
         <div className="w-full md:w-1/2 p-4">
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            {successMessage && (
-              <Alert>
-                <AlertTitle>Success</AlertTitle>
-                <AlertDescription>{successMessage}</AlertDescription>
-              </Alert>
-            )}
-            <div>
+            <div className="">
               <div className="w-full">
-                <Label htmlFor="username">Your Username</Label>
+                <Label htmlFor="username" value="Your Username" />
                 <TextInput
                   id="username"
                   name="username"
                   type="text"
                   placeholder="username"
                   onChange={handleChange}
+                  color={errors.username ? "failure" : undefined}
                 />
+                {errors.username && <p className="mt-1 text-sm text-red-500">{errors.username}</p>}
               </div>
               <div className="w-full mt-1">
-                <Label htmlFor="email">Your Email</Label>
-                <TextInput id="email" name="email" type="email" placeholder="name@example.com" onChange={handleChange} />
+                <Label htmlFor="email" value="Your Email" />
+                <TextInput
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  onChange={handleChange}
+                  color={errors.email ? "failure" : undefined}
+                />
+                {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
               </div>
               <div className="w-full mt-1">
-                <Label htmlFor="password">Your Password</Label>
-                <TextInput id="password" name="password" type="password" placeholder="password" onChange={handleChange} />
+                <Label htmlFor="password" value="Your Password" />
+                <TextInput
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="********"
+                  onChange={handleChange}
+                  color={errors.password ? "failure" : undefined}
+                />
+                {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
               </div>
-              <Button className="w-full mt-4" type="submit" disabled={loading}>
+              <Button className="w-full mt-4" gradientDuoTone="purpleToPink" type="submit" disabled={loading}>
                 {loading ? (
                   <>
-                    <Spinner size="sm" />
+                    <Spinner size="sm" aria-label="Loading spinner" />
                     <span className="pl-3">Loading...</span>
                   </>
                 ) : 'Sign Up'}
@@ -118,17 +94,15 @@ export default function SignUp() {
             </div>
           </form>
           <div>
-            <p className="text-sm mt-4">
-              Already have an account?{' '}
+            <p className="text-sm mt-4">Already have an account?{' '}
               <Link to="/sign-in" className="text-blue-500">
                 Sign In
               </Link>
             </p>
           </div>
-          {errorMessage && (
-            <Alert>
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
+          {error && (
+            <Alert className="mt-4" color="failure">
+              {error}
             </Alert>
           )}
         </div>

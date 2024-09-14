@@ -1,6 +1,7 @@
 import { Footer } from 'flowbite-react'
 import { BsGithub, BsLinkedin, BsFacebook, BsTwitter, BsInstagram ,BsYoutube,BsFillEnvelopeFill} from 'react-icons/bs'
 import { Link } from 'react-router-dom'
+import logo from "../assets/Group.png";
 
 export default function FooterSec() {
     return (
@@ -10,8 +11,7 @@ export default function FooterSec() {
                     <div className='flex'>
                         <div className="mt-1">
                             <Link to="/" className="self-center whitespace-nowrap text-lg lg:text-4xl sm:text-3xl  font-semibold dark:text-white ">
-                                <span className="px-2 py-1 bg-gradient-to-r from-lime-500 via-cyan-500 to-violet-800 rounded-lg text-white">Stars</span>
-                                Blog
+                            <img src={logo} alt="Logo" width={200} height={150} className="max-w-[200px] w-auto "/>
                             </Link>
                         </div>
                     </div>
@@ -19,9 +19,7 @@ export default function FooterSec() {
                         <div className='mt-4 ml-4 text-left'>
                             <Footer.Title title="About" />
                             <Footer.LinkGroup col>
-                                <Footer.Link href="/" target="_blank" rel='noopener noreferrer'>
-                                    Stars Blog
-                                </Footer.Link>
+                                
                                 <Footer.Link href="/about" target="_blank" rel='noopener noreferrer'>
                                     About
                                 </Footer.Link>
